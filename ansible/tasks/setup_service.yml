@@ -1,0 +1,30 @@
+---
+- name: Setting up service
+  set_fact:
+    local_service_dir: "../../services/{{service_name}}"
+    remote_service_dir: "/home/{{ ansible_user }}/services/{{ service_name }}"
+- debug:
+    msg: "service_name={{ service_name }}"
+- debug:
+    msg: "local_service_dir={{ local_service_dir }}"
+- debug:
+    msg: "remote_service_dir={{ remote_service_dir }}"
+
+- name: Create remote service dir
+  file:
+    path: "{{ remote_service_dir }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    state: directory
+    mode: 0755
+
+- name: Copy service files
+  copy:
+    src: "{{ local_service_dir }}/"
+    dest: "{{ remote_service_dir }}/"
+
+- name: Start service
+  community.docker.docker_compose:
+    project_src: "{{ remote_service_dir }}"
+    state: "present"
+    restarted: true

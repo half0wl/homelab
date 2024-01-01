@@ -1,0 +1,6 @@
+all:
+  hosts:
+    gallifrey:
+      ansible_host: 192.168.1.87
+      ansible_ssh_user: ray
+      ansible_ssh_private_key_file: ~/.ssh/gallifrey

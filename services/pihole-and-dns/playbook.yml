@@ -1,0 +1,63 @@
+---
+- name: Deploy Pihole & DNS
+  hosts: gallifrey
+  become: true
+  tasks:
+    - name: "Set service name"
+      set_fact:
+        service_name: "pihole-and-dns"
+        root_domain: "gallifrey.sh"
+        dns_domain: "dns.gallifrey.sh"
+        homebridge_domain: "homebridge.gallifrey.sh"
+        unifi_domain: "unifi.gallifrey.sh"
+
+    - name: Setup service
+      ansible.builtin.import_tasks:
+        file: "../../ansible/tasks/setup_service.yml"
+
+    - name: Use PiHole DNS on host
+      lineinfile:
+        dest: /etc/resolv.conf
+        line: "nameserver 127.0.0.1"
+        mode: "0644"
+
+    - name: "Set up local DNS: {{ root_domain }}"
+      lineinfile:
+        dest: "{{ remote_service_dir }}/etc-pihole/custom.list"
+        line: "{{ ansible_default_ipv4.address }} {{ root_domain }}"
+        mode: "0644"
+        create: true
+
+    - name: "Set up local DNS: {{ dns_domain }}"
+      lineinfile:
+        dest: "{{ remote_service_dir }}/etc-pihole/custom.list"
+        line: "{{ ansible_default_ipv4.address }} {{ dns_domain }}"
+        mode: "0644"
+        create: true
+
+    - name: "Set up local DNS: {{ homebridge_domain }}"
+      lineinfile:
+        dest: "{{ remote_service_dir }}/etc-pihole/custom.list"
+        line: "{{ ansible_default_ipv4.address }} {{ homebridge_domain }}"
+        mode: "0644"
+        create: true
+
+    - name: "Set up local DNS: {{ unifi_domain }}"
+      lineinfile:
+        dest: "{{ remote_service_dir }}/etc-pihole/custom.list"
+        line: "{{ ansible_default_ipv4.address }} {{ unifi_domain }}"
+        mode: "0644"
+        create: true
+
+    - name: Unblock iCloud Private Relay
+      lineinfile:
+        dest: "{{ remote_service_dir }}/etc-pihole/pihole-FTL.conf"
+        line: "BLOCK_ICLOUD_PR=false"
+        mode: "0644"
+        create: true
+
+    - name: Restart service
+      community.docker.docker_compose:
+        project_src: "{{ remote_service_dir }}"
+        state: "present"
+        restarted: true

@@ -1,0 +1,33 @@
+version: "3"
+services:
+  certbot:
+    container_name: certbot
+    image: certbot/dns-cloudflare:v2.8.0
+    restart: unless-stopped
+    network_mode: host
+    user: "$UID:$GID"
+    volumes:
+      - "./certbot_etc:/etc/letsencrypt"
+      - "./cloudflare.ini:/root/cloudflare.ini"
+    command: >-
+      certonly --dns-cloudflare
+      --dns-cloudflare-credentials /root/cloudflare.ini
+      --dns-cloudflare-propagation-seconds 15
+      --email certs@gallifrey.sh
+      --agree-tos
+      --no-eff-email
+      --keep
+      -d gallifrey.sh
+      -d *.gallifrey.sh
+  nginx:
+    container_name: nginx
+    image: nginx:1.25.3-alpine
+    restart: unless-stopped
+    user: "$UID:$GID"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "./nginx:/etc/nginx:rw"
+      - "./index.html:/var/www/html/index.html:rw"
+      - "./certbot_etc:/etc/letsencrypt"

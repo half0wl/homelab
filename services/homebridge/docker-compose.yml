@@ -1,0 +1,15 @@
+version: "3"
+services:
+  homebridge:
+    container_name: homebridge
+    image: homebridge/homebridge:latest
+    restart: unless-stopped
+    network_mode: host
+    user: "$UID:$GID"
+    volumes:
+      - "./homebridge_data:/homebridge"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10mb"
+        max-file: "1"
