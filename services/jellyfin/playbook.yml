@@ -1,0 +1,12 @@
+---
+- name: Deploy jellyfin
+  hosts: gallifrey
+  become: true
+  tasks:
+    - name: "Set service name"
+      set_fact:
+        service_name: "jellyfin"
+
+    - name: Setup service
+      ansible.builtin.import_tasks:
+        file: "../../ansible/tasks/setup_service.yml"

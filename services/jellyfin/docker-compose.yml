@@ -1,0 +1,12 @@
+version: "3"
+services:
+  jellyfin:
+    container_name: jellyfin
+    image: jellyfin/jellyfin
+    restart: unless-stopped
+    network_mode: host
+    user: "$UID:$GID"
+    volumes:
+      - "/vol0_media:/media:rw"
+    # environment:
+    # - JELLYFIN_PublishedServerUrl=""

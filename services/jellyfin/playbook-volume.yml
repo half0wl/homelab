@@ -1,0 +1,20 @@
+---
+- name: Setup volume for jellyfin
+  hosts: gallifrey
+  become: true
+  tasks:
+    - name: Install zfs
+    apt:
+      state: present
+      update_cache: yes
+    pkg:
+      - zfsutils-linux
+
+    - name: Wipe /dev/sda part+bootsector
+      command: sudo dd bs=1M count=20 if=/dev/zero of=/dev/sda
+
+    - name: Setup ZFS on /dev/sda
+      command: sudo zpool create -f vol0_media /dev/sda
+
+    - name: chown ZFS mountpoint to current user
+      command: sudo chown -R $USER /vol0_media
