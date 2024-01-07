@@ -1,0 +1,49 @@
+---
+- name: Deploy Tailscale
+  hosts: gallifrey
+  become: true
+  tasks:
+    - name: Download tailscale
+      get_url:
+        url: https://tailscale.com/install.sh
+        dest: /tmp/ts-install.sh
+        mode: 0755
+
+    - name: Install tailscale
+      shell: /tmp/ts-install.sh
+
+    - name: Check authentication status
+      block:
+        - ansible.builtin.set_fact:
+            _auth_needed: false
+
+        - register: _status
+          changed_when: false
+          ansible.builtin.command:
+            argv:
+              - "tailscale"
+              - "status"
+              - "--json"
+
+        - when: _fields.BackendState == "NeedsLogin"
+          ansible.builtin.set_fact:
+            _auth_needed: true
+          vars:
+            _fields: "{{ _status.stdout | from_json }}"
+
+    - name: Authenticate
+      when: _auth_needed
+      block:
+        - name: get authorization key
+          register: _authkey
+          ansible.builtin.pause:
+            prompt: "Enter Tailscale authorization key"
+            echo: yes
+
+        - name: authorize machine
+          ansible.builtin.command:
+            argv:
+              - "tailscale"
+              - "up"
+              - "--authkey"
+              - "{{ _authkey.user_input }}"

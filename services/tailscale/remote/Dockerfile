@@ -1,0 +1,2 @@
+FROM tailscale/tailscale:latest
+
