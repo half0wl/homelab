@@ -1,6 +1,5 @@
 #/bin/sh
 echo "PORT=${PORT}";
-echo "TS_ACCEPT_DNS=${TS_ACCEPT_DNS}";
 echo "TS_FWD_ADDR=${TS_FWD_ADDR}";
 echo "TS_HOSTNAME=${TS_HOSTNAME}";
 sleep 3;
