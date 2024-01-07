@@ -3,5 +3,5 @@
 }
 
 :8080 {
-    reverse_proxy ${TAILSCALE_FWD_ADDR}
+    reverse_proxy ${TS_FWD_ADDR}
 }

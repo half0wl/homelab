@@ -1,8 +1,7 @@
 #/bin/sh
 echo "PORT=${PORT}";
-echo "TS_USERSPACE=${TS_USERSPACE}";
 echo "TS_ACCEPT_DNS=${TS_ACCEPT_DNS}";
-echo "TS_AUTH_ONCE=${TS_AUTH_ONCE}";
-echo "TAILSCALE_FWD_ADDR=${TAILSCALE_FWD_ADDR}";
+echo "TS_FWD_ADDR=${TS_FWD_ADDR}";
+echo "TS_HOSTNAME=${TS_HOSTNAME}";
 sleep 3;
 /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
