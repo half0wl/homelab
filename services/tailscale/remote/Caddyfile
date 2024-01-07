@@ -2,6 +2,6 @@
     auto_https off
 }
 
-{$DOMAIN} {
+{:$PORT} {
     reverse_proxy ${TAILSCALE_FWD_ADDR}
 }
