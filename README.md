@@ -29,8 +29,10 @@ $ ansible-playbook \
 
 ### Renewing LE cert
 
-Edit [`services/nginx-certbot/cloudflare.ini`](services/nginx-certbot/cloudflare.ini)
-with a valid "Edit Zone DNS" token from CF, and run the Ansible playbook.
+1. Edit [`services/nginx-certbot/cloudflare.ini`](services/nginx-certbot/cloudflare.ini)
+with a valid "Edit Zone DNS" token from CF
+2. Run the Ansible playbook [`services/nginx-certbot/playbook.yml`](services/nginx-certbot/playbook.yml)
+3. SSH into host and restart the nginx container
 
 ## License
 
