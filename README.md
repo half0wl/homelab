@@ -2,6 +2,8 @@
 
 Personal homelab - nothing to see here!
 
+[https://raychen.io/writing/homelab-setup](https://raychen.io/writing/homelab-setup)
+
 ## Services
 
 | Name                                                                       | Location                                                           | Purpose                                                             |
@@ -24,6 +26,11 @@ $ ansible-playbook \
     services/$SERVICE/playbook.yml \
     --ask-become-pass
 ```
+
+### Renewing LE cert
+
+Edit [`services/nginx-certbot/cloudflare.ini`](services/nginx-certbot/cloudflare.ini)
+with a valid "Edit Zone DNS" token from CF, and run the Ansible playbook.
 
 ## License
 
