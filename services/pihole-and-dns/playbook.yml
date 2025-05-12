@@ -12,6 +12,8 @@
         unifi_domain: "unifi.gallifrey.sh"
         observability_domain: "observability.gallifrey.sh"
         jellyfin_domain: "jellyfin.gallifrey.sh"
+        jetkvm_domain: "jetkvm.gallifrey.sh"
+        jetkvm_ip: "192.168.88.202"
         elgato_keylight_air_ip: "192.168.88.230"
         elgato_keylight_air_domain: "elgato-keylight-air.gallifrey.sh"
 
@@ -71,6 +73,13 @@
       lineinfile:
         dest: "{{ remote_service_dir }}/etc-pihole/custom.list"
         line: "{{ elgato_keylight_air_ip }} {{ elgato_keylight_air_domain }}"
+        mode: "0644"
+        create: true
+
+    - name: "Set up local DNS: {{ jetkvm_domain }}"
+      lineinfile:
+        dest: "{{ remote_service_dir }}/etc-pihole/custom.list"
+        line: "{{ jetkvm_ip }} {{ jetkvm_domain }}"
         mode: "0644"
         create: true
 
