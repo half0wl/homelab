@@ -1,20 +1,65 @@
 ---
-- name: Setup volume for jellyfin
+- name: Setup ZFS pool for jellyfin
   hosts: gallifrey
   become: true
   tasks:
     - name: Install zfs
-    apt:
-      state: present
-      update_cache: yes
-    pkg:
-      - zfsutils-linux
+      apt:
+        state: present
+        update_cache: yes
+        pkg:
+          - zfsutils-linux
 
+    - name: Check whether pool already exists
+      command: zpool list vol0_media
+      register: pool_check
+      failed_when: false
+      changed_when: false
+
+    # DESTRUCTIVE: only runs when the pool does not exist yet.
     - name: Wipe /dev/sda part+bootsector
-      command: sudo dd bs=1M count=20 if=/dev/zero of=/dev/sda
+      command: dd bs=1M count=20 if=/dev/zero of=/dev/sda
+      when: pool_check.rc != 0
 
     - name: Setup ZFS on /dev/sda
-      command: sudo zpool create -f vol0_media /dev/sda
+      command: zpool create -f vol0_media /dev/sda
+      when: pool_check.rc != 0
 
-    - name: chown ZFS mountpoint to current user
-      command: sudo chown -R $USER /vol0_media
+    - name: Create datasets
+      community.general.zfs:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - vol0_media/media
+        - vol0_media/jellyfin
+        - vol0_media/jellyfin/config
+        - vol0_media/jellyfin/cache
+
+    - name: Chown mountpoints to service user
+      file:
+        path: /vol0_media
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        recurse: true
+
+    # Without this, docker can bind-mount /vol0_media before ZFS mounts it,
+    # leaving containers writing to the empty stub dir on the root fs.
+    - name: Create docker systemd override dir
+      file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+        mode: "0755"
+
+    - name: Order docker after ZFS mounts
+      copy:
+        dest: /etc/systemd/system/docker.service.d/zfs-order.conf
+        content: |
+          [Unit]
+          After=zfs-mount.service zfs.target
+          Wants=zfs-mount.service
+      register: docker_override
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: true
+      when: docker_override.changed

@@ -7,6 +7,8 @@ services:
     network_mode: host
     user: "$UID:$GID"
     volumes:
-      - "/vol0_media:/media:rw"
+      - "/vol0_media/media:/media:rw"
+      - "/vol0_media/jellyfin/config:/config:rw"
+      - "/vol0_media/jellyfin/cache:/cache:rw"
     # environment:
     # - JELLYFIN_PublishedServerUrl=""
